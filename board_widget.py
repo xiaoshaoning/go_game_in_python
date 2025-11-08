@@ -45,6 +45,7 @@ class GoBoardWidget(QWidget):
         """Setup event listeners for board updates."""
         EventPublisher.subscribe_to_event(GameEventType.STONE_PLACED, self._on_stone_placed)
         EventPublisher.subscribe_to_event(GameEventType.BOARD_CLEARED, self._on_board_cleared)
+        EventPublisher.subscribe_to_event(GameEventType.STONE_CAPTURED, self._on_stone_captured)
 
     def _on_stone_placed(self, event):
         """Handle stone placement event."""
@@ -56,6 +57,12 @@ class GoBoardWidget(QWidget):
     def _on_board_cleared(self, event):
         """Handle board cleared event."""
         self.clear_board()
+
+    def _on_stone_captured(self, event):
+        """Handle stone captured event."""
+        data = event.data
+        if 'row' in data and 'col' in data:
+            self.remove_stone(data['row'], data['col'])
 
     def paintEvent(self, event):
         """Paint the Go board and stones."""

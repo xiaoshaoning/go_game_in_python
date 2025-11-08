@@ -292,6 +292,29 @@ class GoRules:
         """Get current board state."""
         return self.board.copy()
 
+    def replay_stone(self, color: int, row: int, col: int) -> Set[Tuple[int, int]]:
+        """
+        Place a stone during SGF replay without validation checks.
+        This is used for replaying recorded games where moves are already known to be valid.
+
+        Args:
+            color: Stone color
+            row, col: Move coordinates
+
+        Returns:
+            Set of captured stone positions
+        """
+        # Place stone without validation
+        self.board[(row, col)] = color
+
+        # Handle captures
+        captured_stones = self._execute_captures(color, row, col)
+
+        # Update last move for ko rule
+        self.last_move = (row, col)
+
+        return captured_stones
+
     def clear_board(self):
         """Clear the board."""
         self.board.clear()

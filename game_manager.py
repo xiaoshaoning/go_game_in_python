@@ -224,7 +224,7 @@ class GameManager:
             return False
 
     def navigate_sgf(self, action: str):
-        """Navigate through loaded SGF moves."""
+        """Navigate through loaded SGF moves with proper capture handling."""
         if not self.loaded_sgf_moves:
             return
 
@@ -242,20 +242,31 @@ class GameManager:
         if self.go_rules:
             self.go_rules.clear_board()
 
+        # Replay moves one by one to properly simulate captures
+        # Note: current_move_index represents the number of moves to show
         for i in range(self.current_move_index):
             color, row, col = self.loaded_sgf_moves[i]
             stone_color = 1 if color == "B" else 2
             move_number = i + 1
 
             if self.go_rules:
-                self.go_rules.place_stone(stone_color, row, col)
+                # Use replay_stone for SGF replay (bypasses validation since moves are already valid)
+                captured_stones = self.go_rules.replay_stone(stone_color, row, col)
 
-            EventPublisher.publish_event(GameEventType.STONE_PLACED, {
-                'row': row,
-                'col': col,
-                'color': stone_color,
-                'move_number': move_number
-            })
+                # Publish stone placed event
+                EventPublisher.publish_event(GameEventType.STONE_PLACED, {
+                    'row': row,
+                    'col': col,
+                    'color': stone_color,
+                    'move_number': move_number
+                })
+
+                # Publish capture events for any stones that were captured
+                for stone_pos in captured_stones:
+                    EventPublisher.publish_event(GameEventType.STONE_CAPTURED, {
+                        'row': stone_pos[0],
+                        'col': stone_pos[1]
+                    })
 
     def save_game(self, filename: str, properties: dict = None) -> bool:
         """Save current game as SGF."""

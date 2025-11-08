@@ -95,10 +95,31 @@ class SGFParser:
                 self.properties[prop] = match.group(1)
 
     def _extract_moves(self, sgf_string: str):
-        """Extract moves from SGF."""
+        """Extract moves and captures from SGF."""
         # Find all move sequences
         move_pattern = r'([BW])\[([a-z]{0,2})\]'
         matches = re.findall(move_pattern, sgf_string)
+
+        # Extract captures (add white stones and add black stones)
+        self.captured_stones = []
+
+        # AW[] - Add white stones (captured black stones)
+        aw_pattern = r'AW\[([a-z]{2}(?:\][a-z]{2})*)\]'
+        aw_matches = re.findall(aw_pattern, sgf_string)
+        for aw_group in aw_matches:
+            for coord in aw_group.split(']['):
+                if coord:
+                    row, col = self._coord_to_position(coord)
+                    self.captured_stones.append(('W', row, col))
+
+        # AB[] - Add black stones (captured white stones)
+        ab_pattern = r'AB\[([a-z]{2}(?:\][a-z]{2})*)\]'
+        ab_matches = re.findall(ab_pattern, sgf_string)
+        for ab_group in ab_matches:
+            for coord in ab_group.split(']['):
+                if coord:
+                    row, col = self._coord_to_position(coord)
+                    self.captured_stones.append(('B', row, col))
 
         self.moves = []
         for color, coord in matches:
@@ -266,6 +287,10 @@ class SGFParser:
     def get_moves(self) -> List[Tuple[str, int, int]]:
         """Get list of moves."""
         return self.moves
+
+    def get_captured_stones(self) -> List[Tuple[str, int, int]]:
+        """Get list of captured stones."""
+        return self.captured_stones
 
     def get_properties(self) -> Dict[str, str]:
         """Get game properties."""
