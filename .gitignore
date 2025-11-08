@@ -137,3 +137,12 @@ Thumbs.db
 # Game-specific
 *.sgf.bak
 *.log
+
+test*
+debug*
+*test*
+*.sgf
+..gitignore.un~
+.gitignore~
+GITHUB_DESCRIPTION.md
+GITHUB_SHORT_DESCRIPTION.md
