@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 """
-Go Game with PyQt6 GUI - Fixed Version
+Go Game with PyQt6 GUI
 Complete Go game implementation with state machine and GUI
-Fixed signal handling issues
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import sys
@@ -13,7 +25,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
 from PyQt6.QtCore import Qt, QSize, pyqtSignal
 from PyQt6.QtGui import QPainter, QPen, QBrush, QColor, QFont
 
-from gogameenhanced_corrected import StateMachine
+from go_state_machine import StateMachine
 from sgf_parser import SGFParser
 from go_rules import GoRules
 
@@ -103,7 +115,7 @@ class GoBoardWidget(QWidget):
             row = round((y - self.margin) / self.cell_size)
 
             if 0 <= row < self.board_size and 0 <= col < self.board_size:
-                # Emit signal for stone placement - FIXED: using proper signal
+                # Emit signal for stone placement
                 self.stone_clicked.emit(row, col)
 
     def place_stone(self, row, col, color, move_number=0):
@@ -142,7 +154,7 @@ class GoGameWindow(QMainWindow):
 
     def init_ui(self):
         """Initialize the user interface."""
-        self.setWindowTitle("Go Game - Fixed Version")
+        self.setWindowTitle("Go Game")
         self.setGeometry(100, 100, 1000, 700)
 
         # Central widget
@@ -229,7 +241,7 @@ class GoGameWindow(QMainWindow):
 
         control_layout.addStretch()
 
-        # Connect board clicks - FIXED: using proper signal connection
+        # Connect board clicks
         self.board_widget.stone_clicked.connect(self.handle_stone_click)
 
         # Update initial state

@@ -1,55 +1,40 @@
-# Go Game - Complete Implementation
+# Go Game in Python
 
-This is a complete Go game implementation with PyQt6 GUI and state machine architecture.
+A complete Go (围棋) game implementation with modern PyQt6 GUI, state machine architecture, and SGF file support.
 
 ## Features
 
-- **Complete Go Rules**: Stone placement, capture mechanics, ko rule
-- **PyQt6 GUI**: Modern graphical interface
-- **State Machine**: Robust game flow management
+- **Complete Go Rules**: Stone placement, capture mechanics, ko rule, suicide prevention
+- **Modern PyQt6 GUI**: Clean and intuitive graphical interface
+- **State Machine Architecture**: Robust game flow management
 - **SGF Support**: Smart Game Format file loading and saving
-- **Game Recording**: Save and replay games
+- **Game Recording**: Save and replay games with move-by-move navigation
+- **Move Validation**: Real-time Go rules enforcement
 
 ## Requirements
 
 - Python 3.8+
 - PyQt6
 
-## Installation
+## Quick Start
 
-1. **Install PyQt6**:
+### Installation
+
+1. **Clone the repository**:
    ```bash
-   pip install PyQt6
+   git clone https://github.com/xiaoshaoning/go_game_in_python.git
+   cd go_game_in_python
    ```
 
-2. **Verify Installation**:
+2. **Install dependencies**:
    ```bash
-   python -c "import PyQt6.QtWidgets; print('PyQt6 installed successfully')"
+   pip install -r requirements.txt
    ```
 
-## Running the Game
-
-### Option 1: Use the Launcher (Recommended)
+### Running the Game
 
 ```bash
-cd generated_go_complete_v4
-python run_go_game.py
-```
-
-Then select option 1 for GUI version.
-
-### Option 2: Run GUI Directly
-
-```bash
-cd generated_go_complete_v4
-python go_game_gui.py
-```
-
-### Option 3: Test State Machine Only
-
-```bash
-cd generated_go_complete_v4
-python test_go_game_corrected.py
+python go_game.py
 ```
 
 ## Game Controls
@@ -65,83 +50,52 @@ python test_go_game_corrected.py
 - **Click intersections**: Place stones
 - The game automatically handles turn switching and move validation
 
-## Game States
-
-The game uses a state machine with these states:
-
-1. **GUI Initialization**: Initialize PyQt6 components
-2. **Main Menu**: Game menu and options
-3. **Game Setup**: Configure board size, komi, handicap
-4. **Black Turn**: Black player's turn
-5. **White Turn**: White player's turn
-6. **Move Validation**: Validate move legality
-7. **Stone Placement**: Place stone on board
-8. **Liberty Check**: Check liberties and capture stones
-9. **Ko Check**: Verify ko rule compliance
-10. **SGF Loading**: Load SGF files
-11. **SGF Playback**: Play SGF moves
-12. **Game Recording**: Save games as SGF
-13. **Score Calculation**: Calculate final score
-14. **Game Over**: Display results
+### SGF Navigation
+- **First/Previous/Next/Last**: Navigate through SGF moves
+- **Load SGF**: Import existing game records
+- **Save Game**: Export current game to SGF format
 
 ## File Structure
 
-- `gogameenhanced_corrected.py` - Corrected state machine implementation
-- `go_game_gui.py` - PyQt6 GUI application
-- `run_go_game.py` - Game launcher
-- `test_go_game_corrected.py` - State machine test
-- `c/` - C language implementation
-
-## Development
-
-### State Machine
-
-The state machine is generated from the specification in:
-`../go_game/state_machines/go_game_enhanced_v2.json`
-
-### Code Generation
-
-The Python code was generated using Magic Cube workflow and corrected with:
-`../create_corrected_state_machine.py`
-
-## Troubleshooting
-
-### PyQt6 Installation Issues
-
-If you encounter PyQt6 installation issues:
-
-1. **Windows**:
-   ```bash
-   pip install PyQt6
-   ```
-
-2. **macOS**:
-   ```bash
-   pip3 install PyQt6
-   ```
-
-3. **Linux**:
-   ```bash
-   sudo apt-get install python3-pyqt6
-   # or
-   pip install PyQt6
-   ```
-
-### Import Errors
-
-If you get import errors, make sure you're running from the correct directory:
-
-```bash
-cd D:\tools\magic_cube\generated_go_complete_v4
-python go_game_gui.py
+```
+go_game_in_python/
+├── go_game.py          # Main GUI application
+├── go_state_machine.py # State machine implementation
+├── go_rules.py         # Go rules validation engine
+├── sgf_parser.py       # SGF file parser
+├── requirements.txt    # Python dependencies
+├── README.md          # This file
+└── *.sgf              # Example SGF game files
 ```
 
 ## Game Rules
 
-- **Board**: 19x19 grid
-- **Komi**: 6.5 points for white
+- **Board**: 19x19 grid (standard professional size)
+- **Komi**: 6.5 points for white (standard compensation)
 - **Capture**: Stones with no liberties are captured
 - **Ko**: Immediate repetition of board position is forbidden
+- **Suicide**: Self-capture moves are not allowed
 - **Scoring**: Territory + captured stones + komi
 
-Enjoy playing Go!
+## Development
+
+This project uses a state machine architecture for robust game flow management:
+
+- **State Machine**: `go_state_machine.py`
+- **GUI**: `go_game.py` (PyQt6-based interface)
+- **Rules Engine**: `go_rules.py` (Complete Go rules implementation)
+- **SGF Parser**: `sgf_parser.py` (Smart Game Format support)
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit pull requests or open issues for bugs and feature requests.
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- Go rules implementation based on standard Japanese rules
+- SGF format support for game recording and playback
+- PyQt6 for the modern graphical interface

@@ -1,0 +1,13 @@
+# Go Game in Python - Dependencies
+
+# GUI Framework
+PyQt6>=6.0.0
+
+# Optional: For future enhancements
+# numpy>=1.20.0  # For AI and analysis
+# pillow>=8.0.0  # For image handling
+
+# Development dependencies (optional)
+# pytest>=6.0.0  # For testing
+# black>=21.0.0  # For code formatting
+# mypy>=0.900   # For type checking
