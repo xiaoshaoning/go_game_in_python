@@ -59,7 +59,13 @@ python go_game.py
 
 ```
 go_game_in_python/
-├── go_game.py          # Main GUI application
+├── go_game.py          # Main GUI application (modular architecture)
+├── main_window.py      # Main window implementation
+├── board_widget.py     # Go board display component
+├── control_panel.py    # Game controls and status panel
+├── game_manager.py     # Game logic coordinator
+├── dependency_injection.py # Dependency injection container
+├── event_system.py     # Event-driven communication system
 ├── go_state_machine.py # State machine implementation
 ├── go_rules.py         # Go rules validation engine
 ├── sgf_parser.py       # SGF file parser
@@ -77,14 +83,113 @@ go_game_in_python/
 - **Suicide**: Self-capture moves are not allowed
 - **Scoring**: Territory + captured stones + komi
 
-## Development
+## Architecture
 
-This project uses a state machine architecture for robust game flow management:
+This project uses a modular architecture with dependency injection and event-driven design for clean separation of concerns and maintainability.
 
-- **State Machine**: `go_state_machine.py`
-- **GUI**: `go_game.py` (PyQt6-based interface)
-- **Rules Engine**: `go_rules.py` (Complete Go rules implementation)
-- **SGF Parser**: `sgf_parser.py` (Smart Game Format support)
+### Architecture Components
+
+#### 1. Dependency Injection Container
+
+**File: `dependency_injection.py`**
+
+- **DependencyContainer**: Manages service registration and resolution
+- **ServiceProvider**: Global access point for services
+- Supports three registration types:
+  - **Service**: Direct instance
+  - **Factory**: Function that creates instance
+  - **Singleton**: Factory that creates instance once
+
+#### 2. Event System
+
+**File: `event_system.py`**
+
+- **GameEventType**: Enumeration of all game events
+- **GameEvent**: Data container for events
+- **EventBus**: Central event distribution with PyQt signal integration
+- **EventPublisher**: Global access point for event publishing/subscription
+
+#### 3. Core Modules
+
+- **Game Manager** (`game_manager.py`): Coordinates game logic and state, handles stone placement, pass, resign actions, manages SGF file operations
+- **Board Widget** (`board_widget.py`): Displays Go board and stones, handles mouse interactions, publishes stone placement events
+- **Control Panel** (`control_panel.py`): Game controls and status display, SGF file operations, navigation controls
+- **Main Window** (`main_window.py`): Coordinates all UI components, initializes dependency injection, connects event handlers
+- **State Machine** (`go_state_machine.py`): Game flow management
+- **Rules Engine** (`go_rules.py`): Complete Go rules implementation
+- **SGF Parser** (`sgf_parser.py`): Smart Game Format file support
+
+### Dependency Graph
+
+```
+Main Window
+    ├── Board Widget
+    ├── Control Panel
+    └── Game Manager
+        ├── State Machine (via DI)
+        ├── Go Rules (via DI)
+        └── SGF Parser (via DI)
+```
+
+### Event Flow
+
+#### Stone Placement Example
+1. **User clicks** on board → `BoardWidget.stone_clicked` signal
+2. **Main Window** forwards to `GameManager.handle_stone_placement()`
+3. **Game Manager** validates move using `GoRules`
+4. **If valid**: Publishes `STONE_PLACED` event
+5. **Board Widget** receives event and updates display
+6. **State Machine** updates game state
+7. **Control Panel** receives `PLAYER_CHANGED` event and updates status
+
+#### SGF Loading Example
+1. **User clicks** "Load SGF" → `ControlPanel.load_sgf_requested` signal
+2. **Main Window** opens file dialog
+3. **Game Manager** parses file using `SGFParser`
+4. **If successful**: Publishes `SGF_LOADED` event
+5. **Control Panel** receives event and updates status
+6. **Board Widget** receives `BOARD_CLEARED` and `STONE_PLACED` events
+
+### Benefits
+
+#### 1. Separation of Concerns
+- **UI Layer**: BoardWidget, ControlPanel, MainWindow
+- **Business Logic**: GameManager, GoRules, StateMachine
+- **Data Access**: SGFParser
+
+#### 2. Testability
+```python
+# Example unit test for GameManager
+def test_stone_placement():
+    manager = GameManager()
+    manager.initialize_services()
+
+    # Mock dependencies
+    manager.go_rules = MockGoRules()
+    manager.state_machine = MockStateMachine()
+
+    # Test stone placement
+    manager.handle_stone_placement(3, 3)
+
+    # Verify events were published
+    assert event_bus.has_event(GameEventType.STONE_PLACED)
+```
+
+#### 3. Extensibility
+- New features can be added as independent modules
+- Event system allows loose coupling
+- Dependency injection makes swapping implementations easy
+
+#### 4. Maintainability
+- Smaller, focused classes
+- Clear dependency boundaries
+- Easy to understand and modify individual components
+
+### Adding New Features
+1. **New Component**: Create module with clear responsibilities
+2. **Dependencies**: Register in dependency injection container
+3. **Events**: Define new event types and publish/subscribe as needed
+4. **Integration**: Connect in MainWindow or appropriate manager
 
 ## Contributing
 
