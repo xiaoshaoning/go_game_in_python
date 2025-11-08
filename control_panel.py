@@ -186,7 +186,7 @@ class ControlPanel(QWidget):
         """Update navigation buttons state."""
         has_moves = len(self.loaded_sgf_moves) > 0
 
-        self.first_move_btn.setEnabled(has_moves and self.current_move_index > 0)
+        self.first_move_btn.setEnabled(has_moves)
         self.prev_move_btn.setEnabled(has_moves and self.current_move_index > 0)
         self.next_move_btn.setEnabled(has_moves and self.current_move_index < len(self.loaded_sgf_moves))
         self.last_move_btn.setEnabled(has_moves and self.current_move_index < len(self.loaded_sgf_moves))

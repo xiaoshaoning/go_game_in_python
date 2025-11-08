@@ -209,6 +209,10 @@ class GameManager:
                 # Start at first move
                 self.current_move_index = 1 if self.loaded_sgf_moves else 0
 
+                # Immediately display first move after loading
+                if self.loaded_sgf_moves:
+                    self._display_current_position()
+
                 # Publish SGF loaded event
                 EventPublisher.publish_event(GameEventType.SGF_LOADED, {
                     'properties': properties,
@@ -229,7 +233,7 @@ class GameManager:
             return
 
         if action == "first":
-            self.current_move_index = 0
+            self.current_move_index = 1  # Show first move
         elif action == "prev" and self.current_move_index > 0:
             self.current_move_index -= 1
         elif action == "next" and self.current_move_index < len(self.loaded_sgf_moves):
@@ -237,36 +241,8 @@ class GameManager:
         elif action == "last":
             self.current_move_index = len(self.loaded_sgf_moves)
 
-        # Clear board and replay moves up to current index
-        EventPublisher.publish_event(GameEventType.BOARD_CLEARED)
-        if self.go_rules:
-            self.go_rules.clear_board()
-
-        # Replay moves one by one to properly simulate captures
-        # Note: current_move_index represents the number of moves to show
-        for i in range(self.current_move_index):
-            color, row, col = self.loaded_sgf_moves[i]
-            stone_color = 1 if color == "B" else 2
-            move_number = i + 1
-
-            if self.go_rules:
-                # Use replay_stone for SGF replay (bypasses validation since moves are already valid)
-                captured_stones = self.go_rules.replay_stone(stone_color, row, col)
-
-                # Publish stone placed event
-                EventPublisher.publish_event(GameEventType.STONE_PLACED, {
-                    'row': row,
-                    'col': col,
-                    'color': stone_color,
-                    'move_number': move_number
-                })
-
-                # Publish capture events for any stones that were captured
-                for stone_pos in captured_stones:
-                    EventPublisher.publish_event(GameEventType.STONE_CAPTURED, {
-                        'row': stone_pos[0],
-                        'col': stone_pos[1]
-                    })
+        # Display the current position
+        self._display_current_position()
 
     def save_game(self, filename: str, properties: dict = None) -> bool:
         """Save current game as SGF."""
@@ -296,6 +272,38 @@ class GameManager:
         except Exception as e:
             print(f"Error saving game: {e}")
             return False
+
+    def _display_current_position(self):
+        """Display the current SGF position based on current_move_index."""
+        # Clear board
+        EventPublisher.publish_event(GameEventType.BOARD_CLEARED)
+        if self.go_rules:
+            self.go_rules.clear_board()
+
+        # Replay moves up to current index
+        for i in range(self.current_move_index):
+            color, row, col = self.loaded_sgf_moves[i]
+            stone_color = 1 if color == "B" else 2
+            move_number = i + 1
+
+            if self.go_rules:
+                # Use replay_stone for SGF replay (bypasses validation since moves are already valid)
+                captured_stones = self.go_rules.replay_stone(stone_color, row, col)
+
+                # Publish stone placed event
+                EventPublisher.publish_event(GameEventType.STONE_PLACED, {
+                    'row': row,
+                    'col': col,
+                    'color': stone_color,
+                    'move_number': move_number
+                })
+
+                # Publish capture events for any stones that were captured
+                for stone_pos in captured_stones:
+                    EventPublisher.publish_event(GameEventType.STONE_CAPTURED, {
+                        'row': stone_pos[0],
+                        'col': stone_pos[1]
+                    })
 
     def _on_stone_placed(self, event):
         """Handle stone placed event (for internal tracking)."""
